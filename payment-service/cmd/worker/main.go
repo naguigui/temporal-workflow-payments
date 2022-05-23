@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"go.temporal.io/sdk/client"
@@ -9,13 +8,15 @@ import (
 
 	"temporal-eg/common/constants"
 	inmemory "temporal-eg/payment-service/adapter/in-memory"
+	"temporal-eg/pkg/log"
 	"temporal-eg/pkg/temporal/payment"
 )
 
 func main() {
+	logger := log.New()
 	c, err := client.NewClient(client.Options{})
 	if err != nil {
-		fmt.Println("failed to create temporal client: %w", err)
+		logger.Errorf("failed to create temporal client: %w", err)
 		os.Exit(-1)
 	}
 	defer c.Close()
@@ -29,7 +30,7 @@ func main() {
 	w.RegisterActivity(paymentActivity.CreatePaymentIntent)
 	err = w.Run(worker.InterruptCh())
 	if err != nil {
-		fmt.Println("failed to run worker: %w", err)
+		logger.Errorf("failed to run worker: %w", err)
 		os.Exit(-1)
 	}
 }
